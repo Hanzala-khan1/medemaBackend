@@ -6,40 +6,49 @@ const User = require("../../models/User");
 const JWTService = require("../../services/JWTService.js");
 const RefreshToken = require("../../models/token.js");
 const AccessToken = require("../../models/accessToken.js");
+const { registerUser, getuserUser } = require("./user.validation.js");
+const { userTypeEnum, userStatusEnum } = require("../../services/enum.js");
+const { uploadImages } = require("../utils/uploadFileController.js");
+const { getByIds, getList, pick, getOne } = require("../../services/crudServices.js");
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,25}$/;
 
 const userAuthController = {
   async register(req, res, next) {
-    const userRegisterSchema = Joi.object({
-      userName: Joi.string().required(),
-      email: Joi.string().required(),
-      role: Joi.string(),
-      savedRehab: Joi.string(),
-      password: Joi.string().required(),
-    });
-
-    const { error } = userRegisterSchema.validate(req.body);
+let file =req.file
+    const { error } = registerUser.validate(req.body);
 
     if (error) {
       return next(error);
     }
 
-    const { userName, email, role, savedRehab, password } = req.body;
+    const { email, password } = req.body;
 
+    const alreadyExistUser = await User.findOne({
+      email: email
+    })
+    if (alreadyExistUser) {
+      const error = {
+        status: 401,
+        message: "User with this email already exist",
+      };
+
+      return next(error);
+    }
+    if (req.body.type == userTypeEnum.Individual) {
+      req.body['status']=userStatusEnum.active
+    }
+
+    // if (req.body.images && req.body.images.length) {
+    //   const images =await uploadImages(req, res)
+    // }
     let accessToken;
     let refreshToken;
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    req.body.password = hashedPassword
     let user;
     try {
-      const userToRegister = new User({
-        userName,
-        email,
-        role,
-        savedRehab,
-        password: hashedPassword
-      });
+      const userToRegister = new User(req.body);
 
       user = await userToRegister.save();
 
@@ -68,39 +77,26 @@ const userAuthController = {
       password: Joi.string(),
     });
     const { error } = userLoginSchema.validate(req.body);
-    
+
     if (error) {
-        return next(error);
+      return next(error);
     }
-    
+
     const { email, password } = req.body;
-    
+
     let doc;
-    
+
     try {
-        // match username
-        doc = await User.findOne({ email: email });
-        console.log(doc);
-        if (!doc) {
-            const error = {
+      // match username
+      doc = await User.findOne({ email: email });
+      if (!doc) {
+        const error = {
           status: 401,
           message: "Invalid email",
         };
-        //     return next(error);
-        //   }
-        //   if (doc.isVerified == false) {
-            //     const error = {
-                //       status: 401,
-                //       message: "User not verified",
-                //     };
-                
-                //     return next(error);
       }
-      
-      // match password
-      
+
       const match = await bcrypt.compare(password, doc.password);
-      console.log("object");
 
       if (!match) {
         const error = {
@@ -191,12 +187,8 @@ const userAuthController = {
     // const refHeader = req.headers["refreshToken"];
     // const refreshToken = refHeader && refHeader.split(" ")[1];
     const userId = req.user._id;
-    // console.log(userId)
     const authHeader = req.headers["authorization"];
     const accessToken = authHeader && authHeader.split(" ")[1];
-    // console.log("object");
-    // console.log(accessToken);
-    // console.log(refreshToken);
     try {
       await RefreshToken.deleteOne({ userId });
     } catch (error) {
@@ -211,12 +203,36 @@ const userAuthController = {
     // 2. response
     res.status(200).json({ user: null, auth: false });
   },
-  async getAllUser(req, res, next) {
+  async getAUserByType(req, res, next) {
     try {
-      const userList = await User.find();
+      let { type, role, rehab, search ,sort,pricefilter} = req.body
+      const { error } = getuserUser.validate(req.body);
+
+      if (error) {
+        return next(error);
+      }
+
+      let query = {
+        type: type,
+        role: role
+      }
+      if (search) {
+        query["full_name"] = { $regex: '.*' + search + '.*', $options: 'i' }
+      }
+      if (rehab) {
+        query['query'] = rehab
+      }
+      const options = pick(req.body, ["limit", "page"]);
+      if (sort){
+         sort=="ascending"?(sort=1):(sort=-1)
+        options["sort"]={
+          full_name:sort
+        }
+      }
+      const userList = await getList(User, query, options, [])
 
       if (!userList) {
-        const error = new Error("Rehab List not found!");
+        const error = new Error("users not found!");
         error.status = 404;
         return next(error);
       }
@@ -224,7 +240,27 @@ const userAuthController = {
     } catch (error) {
       return next(error);
     }
-    },
+  },
+  async getUserByID(req, res, next) {
+    try {
+    let userId=  req.query.id;
+    if (!userId) {
+      const error = new Error("User ID is required");
+      error.status = 404;
+      return next(error);
+    }
+      const userList = await User.findById("6605a6d64c87425ce8c7391b")
+
+      if (!userList) {
+        const error = new Error("users not found!");
+        error.status = 404;
+        return next(error);
+      }
+      return res.status(200).json({ userList });
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 module.exports = userAuthController;

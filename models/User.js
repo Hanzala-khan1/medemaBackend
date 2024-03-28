@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const { userTypeEnum, userRoleEnum } = require("../services/enum");
-const  paginate  = require('../services/pagination.pulgin');
+const { userTypeEnum, userRoleEnum, userStatusEnum } = require("../services/enum");
+const paginate = require('../services/pagination.pulgin');
 
 const userSchema = new mongoose.Schema(
   {
@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
       enum: [
         userTypeEnum.Individual,
         userTypeEnum.RehabEmployee,
+        userTypeEnum.Visiter,
       ]
     },
     role: {
@@ -21,8 +22,10 @@ const userSchema = new mongoose.Schema(
         userRoleEnum.Patient,
         userRoleEnum.PhysioDcotor,
         userRoleEnum.Webvister,
+        userRoleEnum.RehabAdmin,
         userRoleEnum.Aya,
         userRoleEnum.Receptionist,
+        userRoleEnum.Visiter,
       ]
     },
     full_name: {
@@ -45,6 +48,7 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
+      required: true,
     },
     is_rehab_employee: {
       type: Boolean,
@@ -57,7 +61,7 @@ const userSchema = new mongoose.Schema(
     rehab: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "RehabList",
-      required:false
+      required: false
     },
     is_super_admin: {
       type: Boolean,
@@ -81,6 +85,27 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
     },
+    hospital: {
+      type: String,
+    },
+    emergency: {
+      type: String,
+    },
+    perHour: {
+      type: String,
+    },
+    perDay: {
+      type: String,
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: [
+        userStatusEnum.active,
+        userStatusEnum.inactive,
+        userStatusEnum.blocked,
+      ]
+    },
     images: [{
       name: {
         type: String,
@@ -95,11 +120,14 @@ const userSchema = new mongoose.Schema(
     long: {
       type: String,
     },
-    ref: {
+    description: {
       type: String,
     },
-    rgNo: {
+    discount: {
       type: String,
+    },
+    totalbookings: {
+      type: Number,
     },
     speciality: {
       type: String,
@@ -116,12 +144,12 @@ const userSchema = new mongoose.Schema(
       default: Date.now(),
     },
     created_by: {
-      type: mongoose.SchemaTypes.ObjectId, 
-      ref: "User", 
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "User",
     },
     updated_by: {
-      type: mongoose.SchemaTypes.ObjectId, 
-      ref: "User", 
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "User",
     }
   },
   {

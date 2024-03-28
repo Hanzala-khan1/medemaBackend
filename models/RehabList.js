@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
 const rehabSvhema = new mongoose.Schema({
-  address: {
+  Name: {
     type: String,
   },
   description: {
     type: String,
   },
-  discount: {   
+  package: {
     type: String,
   },
   doctorAvail: {
@@ -63,11 +63,27 @@ const rehabSvhema = new mongoose.Schema({
   powerBackup: {
     type: Boolean,
   },
-  createdAt: {
+  created_at: {
     type: Date,
     default: Date.now(),
   },
-});
+  updated_at: {
+    type: Date,
+    default: Date.now(),
+  },
+  created_by: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "User",
+  },
+  updated_by: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "User",
+  }
+},
+{
+  timestamps: true // Add timestamps
+}
+);
 
 const RehabList = mongoose.model("RehabList", rehabSvhema);
 
