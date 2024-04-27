@@ -7,7 +7,7 @@ const Booking = require("../../models/Booking");
 const RehabList = require("../../models/RehabList");
 const { BookingvValidations } = require("./booking.Validations");
 const { bookingTypeEnum, userTypeEnum, bookingStatusEnum } = require("../../services/enum");
-const { getList } = require("../../services/crudServices");
+const { getList, pick } = require("../../services/crudServices");
 
 const bookingController = {
   async addBooking(req, res, next) {
@@ -19,7 +19,7 @@ const bookingController = {
       }
       let { booking_type, requested_user_id, requested_rehab_id } = data
 
-      data['booked_by'] = req.user.id
+      data['booked_by'] = req.user._id.toString()
 
       if (booking_type == bookingTypeEnum.user) {
         data['is_booked_rehab'] = false
@@ -39,7 +39,10 @@ const bookingController = {
           return next(error);
         }
       }
-      data['status'] =bookingStatusEnum.pending
+      // if (data.rate){
+      //   data.rate
+      // }
+      data['status'] = bookingStatusEnum.pending
       data['payment_status'] = "unpaid"
       data['created_at'] = new Date()
       data['created_by'] = req.user.id
@@ -80,7 +83,7 @@ const bookingController = {
   async getAllBookings(req, res, next) {
     try {
 
-      let userId = req.user.id
+      let userId = req.user._id.toString()
       let userData = await User.findById(userId)
       if (!userData) {
         const error = new Error("No User found!");
@@ -88,6 +91,9 @@ const bookingController = {
         return next(error);
       }
       let query = {}
+      if (userData.type == userTypeEnum.Visiter){
+        query['created_by'] = userId
+      }
       if (userData.type == userTypeEnum.Individual) {
         query['requested_user_id'] = userId
       }
@@ -96,9 +102,19 @@ const bookingController = {
           query['requested_rehab_id'] = userData.rehab
         }
       }
-   
+      if (req.query.status){
+        query['status'] = req.query.status
+      }
+
       const options = pick(req.body, ["limit", "page"]);
-      const bookinglist = await getList(Booking, query, options, [])
+      const bookinglist = await getList(Booking, query, options, ["requested_user_id",'booked_by'])
+      let reults=bookinglist.results
+      for (i=0;i<=10;i++){
+        bookinglist.results.forEach(result => {
+          reults.push(result)
+        });
+      }
+      bookinglist.results=reults
       if (!bookinglist) {
         const error = new Error("No bookings found!");
         error.status = 404;

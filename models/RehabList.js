@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const paginate = require('../services/pagination.pulgin');
 
 const rehabSvhema = new mongoose.Schema({
   Name: {
@@ -19,6 +20,9 @@ const rehabSvhema = new mongoose.Schema({
   oldPrice: {
     type: Boolean,
   },
+  discount: {
+    type: String,
+  },
   title: {
     type: Boolean,
   },
@@ -26,6 +30,9 @@ const rehabSvhema = new mongoose.Schema({
     type: String,
   },
   fees: {
+    type: String,
+  },
+  address: {
     type: String,
   },
   email: {
@@ -60,6 +67,15 @@ const rehabSvhema = new mongoose.Schema({
   perHour: {
     type: String,
   },
+  status: {
+    type: String,
+    enum:["active","inactive"],
+    default: "inactive"
+  },
+  is_active: {
+    type: Boolean,
+    default: false
+  },
   powerBackup: {
     type: Boolean,
   },
@@ -84,6 +100,8 @@ const rehabSvhema = new mongoose.Schema({
   timestamps: true // Add timestamps
 }
 );
+
+rehabSvhema.plugin(paginate);
 
 const RehabList = mongoose.model("RehabList", rehabSvhema);
 

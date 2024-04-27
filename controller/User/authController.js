@@ -15,7 +15,7 @@ const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,25}$/;
 
 const userAuthController = {
   async register(req, res, next) {
-let file =req.file
+// let file =req.file
     const { error } = registerUser.validate(req.body);
 
     if (error) {
@@ -184,9 +184,9 @@ let file =req.file
 
   async logout(req, res, next) {
     // 1. delete refresh token from db
-    // const refHeader = req.headers["refreshToken"];
-    // const refreshToken = refHeader && refHeader.split(" ")[1];
-    const userId = req.user._id;
+    const refHeader = req.headers["refreshToken"];
+    const refreshToken = refHeader && refHeader.split(" ")[1];
+    const userId = req.user.id;
     const authHeader = req.headers["authorization"];
     const accessToken = authHeader && authHeader.split(" ")[1];
     try {
@@ -243,13 +243,13 @@ let file =req.file
   },
   async getUserByID(req, res, next) {
     try {
-    let userId=  req.query.id;
-    if (!userId) {
-      const error = new Error("User ID is required");
-      error.status = 404;
-      return next(error);
-    }
-      const userList = await User.findById("6605a6d64c87425ce8c7391b")
+      let userId = req.query.id ? req.query.id : req.user.id
+      if (!userId) {
+        const error = new Error("User ID is required");
+        error.status = 404;
+        return next(error);
+      }
+      const userList = await User.findById(userId)
 
       if (!userList) {
         const error = new Error("users not found!");

@@ -1,7 +1,8 @@
 const userTypeEnum = Object.freeze({
     RehabEmployee: 'RehabEmployee',
     Individual: "Individual",
-    Visiter: "Visiter"
+    Visiter: "Visiter",
+    Admin: "Admin",
 });
 
 const userRoleEnum = Object.freeze({
@@ -24,7 +25,8 @@ const userStatusEnum = Object.freeze({
 const bookingStatusEnum = Object.freeze({
     pending: "pending",
     accepted: "accepted",
-    rejected: "rejected"
+    rejected: "rejected",
+    completed: "completed"
 })
 
 

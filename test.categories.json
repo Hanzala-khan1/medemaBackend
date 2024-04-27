@@ -1,0 +1,55 @@
+[{
+  "_id": {
+    "$oid": "6575e2b36a12e2e9a5190a70"
+  },
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore",
+  "name": "Rehabilitation Care",
+  "images": {
+    "name": "category-card.png",
+    "url": "https://firebasestorage.googleapis.com/v0/b/medemaa-495d8.appspot.com/o/categories%2Fcategory-card.png?alt=media&token=59b34cc4-6e1f-4eb3-985e-6b399b9b876f"
+  }
+},
+{
+  "_id": {
+    "$oid": "6575e44d6a12e2e9a5190a71"
+  },
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore",
+  "name": "Ask Experts",
+  "images": {
+    "name": "white-card-with-inscription-ask-expert-medical-protective-mask_284815-4290.jpg",
+    "url": "https://img.freepik.com/premium-photo/white-card-with-inscription-ask-expert-medical-protective-mask_284815-4290.jpg?w=2000"
+  }
+},
+{
+  "_id": {
+    "$oid": "6575e4e56a12e2e9a5190a72"
+  },
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore",
+  "name": "Nursing Care",
+  "images": {
+    "name": "category-card-3.jpg",
+    "url": "https://firebasestorage.googleapis.com/v0/b/medemaa-495d8.appspot.com/o/categories%2Fcategory-card-3.jpg?alt=media&token=d5a64419-905b-4623-a8a0-d18e0fd61d88"
+  }
+},
+{
+  "_id": {
+    "$oid": "6575e5616a12e2e9a5190a74"
+  },
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore",
+  "name": "Aya Care",
+  "images": {
+    "name": "category-card-2.jpg",
+    "url": "https://firebasestorage.googleapis.com/v0/b/medemaa-495d8.appspot.com/o/categories%2Fcategory-card-2.jpg?alt=media&token=bc19b8b6-e8fe-4a86-9e01-42e21dedd1c2"
+  }
+},
+{
+  "_id": {
+    "$oid": "6575e5936a12e2e9a5190a75"
+  },
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore",
+  "name": "Physio Care",
+  "images": {
+    "name": "rc-upload-1691180367344-2",
+    "url": "https://firebasestorage.googleapis.com/v0/b/medemaa-495d8.appspot.com/o/categories%2Frc-upload-1691180367344-2?alt=media&token=c7479820-0d56-4b6a-ae81-7c02712c610a"
+  }
+}]

@@ -9,13 +9,13 @@ const auth = async (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const accessToken = authHeader && authHeader.split(" ")[1];
     const ifTokenExists = await AccessToken.find({ token: accessToken });
-    if (ifTokenExists == "") {
-      const error = {
-        status: 401,
-        message: "Unauthorized",
-      };
-      return next(error);
-    }
+    // if (ifTokenExists == "") {
+    //   const error = {
+    //     status: 401,
+    //     message: "Unauthorized",
+    //   };
+    //   return next(error);
+    // }
     
     if (!accessToken) {
       const error = {
@@ -35,7 +35,7 @@ const auth = async (req, res, next) => {
       return next(error);
     }
     let user;
-    if (req.originalUrl.includes("/user")) {
+    // if (req.originalUrl.includes("/user")) {
       try {
         user = await User.findOne({ _id: _id });
       } catch (error) {
@@ -46,7 +46,7 @@ const auth = async (req, res, next) => {
 
       next();
       return;
-     } 
+    //  } 
     //  else 
     //  if (req.originalUrl.includes("/vendor")) {
     //   try {

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { bookingStatusEnum, bookingTypeEnum } = require("../services/enum");
+const paginate = require('../services/pagination.pulgin');
 
 const bookingSchema = new mongoose.Schema({
   booking_type: {
@@ -21,8 +22,8 @@ const bookingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Rehab",
   },
-  is_booked_rehab:{
-    type:Boolean
+  is_booked_rehab: {
+    type: Boolean
   },
   appointment_date: {
     type: Date,
@@ -41,12 +42,16 @@ const bookingSchema = new mongoose.Schema({
   },
   package: {
     type: String,
-    enum:["perDay","weekly","monthly"]
+    enum: ["perDay", "weekly", "monthly"]
   },
-  reason_for_booking:{
+  rate_type: {
+    type: String,
+    enum: ["perDay", "perHour"]
+  },
+  reason_for_booking: {
     type: String,
   },
-  booking_Desc:{
+  booking_Desc: {
     type: String,
   },
   amount: {
@@ -84,12 +89,8 @@ const bookingSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: [bookingStatusEnum.accepted,bookingStatusEnum.pending,bookingStatusEnum.rejected],
+    enum: [bookingStatusEnum.accepted, bookingStatusEnum.pending, bookingStatusEnum.rejected, bookingStatusEnum.completed],
     default: "pending",
-  },
-  type: {
-    type: String,
-    enum: ["hourly", "daily"], 
   },
   start_time: {
     type: Date,
@@ -109,14 +110,16 @@ const bookingSchema = new mongoose.Schema({
     default: Date.now,
   },
   created_by: {
-    type: Date,
+    type: String,
     default: Date.now,
   },
   updated_by: {
-    type: Date,
+    type: String,
     default: Date.now,
   },
 });
+
+bookingSchema.plugin(paginate);
 
 const Booking = mongoose.model("Booking", bookingSchema);
 

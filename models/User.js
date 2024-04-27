@@ -11,7 +11,9 @@ const userSchema = new mongoose.Schema(
         userTypeEnum.Individual,
         userTypeEnum.RehabEmployee,
         userTypeEnum.Visiter,
-      ]
+        userTypeEnum.Admin,
+      ],
+      default:userTypeEnum.Individual
     },
     role: {
       type: String,
@@ -26,7 +28,8 @@ const userSchema = new mongoose.Schema(
         userRoleEnum.Aya,
         userRoleEnum.Receptionist,
         userRoleEnum.Visiter,
-      ]
+      ],
+      default:userRoleEnum.Webvister
     },
     full_name: {
       type: String,

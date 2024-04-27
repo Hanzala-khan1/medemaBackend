@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 const userRouter = require("./routes/user");
-const vendorRouter = require("./routes/vendor");
+const Messagesroutes = require("./routes/messages");
 
 
 app.get("/", (req, res) => {
@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
 })
 
 app.use(userRouter);
-// app.use(vendorRouter);
+app.use(Messagesroutes);
 
 dbConnect();
 app.use(ErrorHandler);

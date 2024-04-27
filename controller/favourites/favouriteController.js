@@ -7,41 +7,50 @@ const RehabList = require("../../models/RehabList");
 const JWTService = require("../../services/JWTService.js");
 const RefreshToken = require("../../models/token.js");
 const AccessToken = require("../../models/accessToken.js");
+const { favouriteUser } = require("./favourite.validation.js");
+const Favourite = require("../../models/Favourites.js");
+const { pick, getList } = require("../../services/crudServices.js");
 
 const favouriteController = {
   async addRemoveFav(req, res, next) {
     try {
-      const rehabId = req.body.rehabId;
-      const userId = req.body.userId;
+      const rehabId = req.body.rehab_id;
+      const userId = req.body.user_id;
 
-      const rehab = await RehabList.findOne({ _id: rehabId });
-      if (!rehab) {
-        const error = new Error("Rehab not found!");
-        error.status = 404;
+      const { error } = favouriteUser.validate(req.body);
+      if (error) {
         return next(error);
       }
-
-      const user = await User.findOne({ _id: userId });
-      if (!user) {
-        const error = new Error("User not found!");
-        error.status = 404;
-        return next(error);
+      const alreadyExist = await Favourite.findOne({
+        rehab_id: rehabId,
+        user_id: userId
+      });
+      if (alreadyExist) {
+        await Favourite.findByIdAndRemove(alreadyExist._id)
+        return res.status(200).json({ added: true });
       }
-
-      const alreadyExistsIndex = user.savedRehab.indexOf(rehabId);
-
-      if (alreadyExistsIndex !== -1) {
-        // If the rehabId is found in the favourites array, remove it using the pull operator
-        user.savedRehab.pull(rehabId);
-      } else {
-        // If the rehabId is not found, add it to the favourites array
-        user.savedRehab.push(rehabId);
+      if (rehabId) {
+        const rehab = await RehabList.findOne({ _id: rehabId });
+        if (!rehab) {
+          const error = new Error("Rehab not found!");
+          error.status = 404;
+          return next(error);
+        }
       }
+      if (rehabId) {
+        const userdata = await User.findOne({ _id: rehabId });
+        if (!userdata) {
+          const error = new Error("user not found!");
+          error.status = 404;
+          return next(error);
+        }
+      }
+      req.body["created_by"] = req.user._id
+      req.body["created_at"] = new Date()
 
-      // Save the updated user document
-      await user.save();
-
-      return res.status(200).json({ user });
+      const favourite = await new Favourite(req.body)
+      await favourite.save()
+      return res.status(200).json({ added: true });
     } catch (error) {
       return next(error);
     }
@@ -49,20 +58,42 @@ const favouriteController = {
 
   async getAllFav(req, res, next) {
     try {
-      const userId = req.query.userId;
-
-      const user = await User.findOne({ _id: userId }).populate("savedRehab");
-      console.log(user)
+      const userId = req.user._id.toString();
+      const user = await User.findOne({ _id: userId })
       if (!user) {
         const error = new Error("User not found!");
         error.status = 404;
         return next(error);
       }
-      const favourites = user.savedRehab;
-      // Save the updated user document
-      await user.save();
+      let query = {
+        created_by: userId
+      }
 
+      req.body["limit"] = req.body.limit || 10;
+      req.body["page"] = req.body.page || 1;
+
+      const options = pick(req.body, ["limit", "page"]);
+      const favourites = await getList(Favourite, query, options, ["rehab_id","user_id"])
+      let userFavouriteByType = []
+      if (favourites && favourites.results.length) {
+        let categories = []
+
+        for (category of categories) {
+          query["category"] = category
+          const userfavourite = await getList(Favourite, query, options, ["rehab_id","user_id"])
+
+          if (userfavourite && userfavourite.length) {
+            let obj = {
+              categoryname: category,
+              favourites: userfavourite.results
+            }
+            userFavouriteByType.push(obj)
+          }
+        }
+      }
+      favourites["userFavouriteByType"] = userFavouriteByType
       return res.status(200).json({ savedRehab: favourites });
+
     } catch (error) {
       return next(error);
     }
