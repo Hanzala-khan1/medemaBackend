@@ -67,6 +67,19 @@ const rehabListController = {
         rehab:new_rehab._id.toString(),
         status:userStatusEnum.active
       }
+      const alreadyExistUser = await User.findOne({
+        email: req.body.email
+      })
+      if (alreadyExistUser) {
+        const error = {
+          status: 401,
+          message: "User with this email already exist",
+        };
+  
+        return next(error);
+      }
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      req.body.password = hashedPassword
       let rehab_Admin = await new User(user)
 
       new_rehab["rehab_Admin"] = rehab_Admin._id.toString()

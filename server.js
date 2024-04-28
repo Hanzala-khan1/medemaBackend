@@ -8,6 +8,8 @@ const dbConnect = require("./database/index");
 const ErrorHandler = require("./middlewares/errorHandler");
 const { PORT } = require("./config/index");
 const bodyParser = require('body-parser');
+const router = express.Router();
+
 
 app.use(express.json({ limit: "50mb" }));
 
@@ -22,6 +24,8 @@ const Messagesroutes = require("./routes/messages");
 app.get("/", (req, res) => {
   res.send("app is running bro");
 })
+
+router.use('/profile', express.static("./upload/images/"));
 
 app.use(userRouter);
 app.use(Messagesroutes);

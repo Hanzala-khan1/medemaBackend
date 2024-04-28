@@ -43,7 +43,7 @@ const bookingController = {
       //   data.rate
       // }
       data['status'] = bookingStatusEnum.pending
-      data['payment_status'] = "unpaid"
+      data['payment_status'] = "paid"
       data['created_at'] = new Date()
       data['created_by'] = req.user.id
       data['updated_at'] = new Date()
@@ -91,7 +91,7 @@ const bookingController = {
         return next(error);
       }
       let query = {}
-      if (userData.type == userTypeEnum.Visiter){
+      if (userData.type == userTypeEnum.Visiter) {
         query['created_by'] = userId
       }
       if (userData.type == userTypeEnum.Individual) {
@@ -102,19 +102,19 @@ const bookingController = {
           query['requested_rehab_id'] = userData.rehab
         }
       }
-      if (req.query.status){
+      if (req.query.status) {
         query['status'] = req.query.status
       }
 
       const options = pick(req.body, ["limit", "page"]);
-      const bookinglist = await getList(Booking, query, options, ["requested_user_id",'booked_by'])
-      let reults=bookinglist.results
-      for (i=0;i<=10;i++){
-        bookinglist.results.forEach(result => {
-          reults.push(result)
-        });
-      }
-      bookinglist.results=reults
+      const bookinglist = await getList(Booking, query, options, ["requested_user_id", 'booked_by','requested_rehab_id'])
+      let reults = bookinglist.results
+      // for (i = 0; i <= 10; i++) {
+      //   bookinglist.results.forEach(result => {
+      //     reults.push(result)
+      //   });
+      // }
+      bookinglist.results = reults
       if (!bookinglist) {
         const error = new Error("No bookings found!");
         error.status = 404;
@@ -126,6 +126,33 @@ const bookingController = {
       return next(error);
     }
   },
+
+  async changeBookingStatus(req, res, next) {
+    try {
+      const id = req.body.bookingId;
+      const status = req.body.status;
+  
+      const booking = await Booking.findOne({ _id: id });
+      if (!booking) {
+        const error = new Error("Booking not found!");
+        error.status = 404;
+        throw error; // Throw instead of returning next(error)
+      }
+  
+      const updateBooking = await Booking.findByIdAndUpdate(id, { $set: { status: status } }, { new: true }); // Add { new: true } to get the updated document
+  
+      if (!updateBooking) {
+        const error = new Error("Failed to update booking status!");
+        error.status = 500; // Internal server error
+        throw error;
+      }
+  
+      return res.status(200).json({ booking: updateBooking });
+    } catch (error) {
+      return next(error);
+    }
+  }
+  
 };
 
 module.exports = bookingController;

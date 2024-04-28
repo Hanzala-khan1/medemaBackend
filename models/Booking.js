@@ -11,7 +11,7 @@ const bookingSchema = new mongoose.Schema({
   requested_user_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: false,
   },
   booked_by: {
     type: mongoose.Schema.Types.ObjectId,
@@ -85,7 +85,7 @@ const bookingSchema = new mongoose.Schema({
   payment_status: {
     type: String,
     enum: ["unpaid", "paid"],
-    default: "unpaid",
+    default: "paid",
   },
   status: {
     type: String,

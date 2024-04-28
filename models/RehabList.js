@@ -38,14 +38,10 @@ const rehabSvhema = new mongoose.Schema({
   email: {
     type: String,
   },
-  images: {
-    name: {
-      type: String,
-    },
-    url: {
-      type: String,
-    },
-  },
+  images: [{
+    type: String,
+
+  }],
   lat: {
     type: String,
   },

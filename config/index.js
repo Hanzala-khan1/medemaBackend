@@ -7,6 +7,7 @@ const BACKEND_SERVER_PATH = process.env.BACKEND_SERVER_PATH;
 const CLOUD_NAME = process.env.CLOUD_NAME;
 const API_KEY = process.env.API_KEY;
 const API_SECRET = process.env.API_SECRET;
+const App_host= "https://medeema-backend-8736fa6bae09.herokuapp.com/"
 
 module.exports = {
   PORT,
@@ -16,4 +17,5 @@ module.exports = {
   CLOUD_NAME,
   API_KEY,
   API_SECRET,
+  App_host
 };

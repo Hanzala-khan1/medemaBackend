@@ -110,12 +110,7 @@ const userSchema = new mongoose.Schema(
       ]
     },
     images: [{
-      name: {
-        type: String,
-      },
-      url: {
-        type: String,
-      },
+      type: String,
     }],
     lat: {
       type: String,

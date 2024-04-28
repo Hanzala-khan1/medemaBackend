@@ -10,12 +10,13 @@ const { registerUser, getuserUser } = require("./user.validation.js");
 const { userTypeEnum, userStatusEnum } = require("../../services/enum.js");
 const { uploadImages } = require("../utils/uploadFileController.js");
 const { getByIds, getList, pick, getOne } = require("../../services/crudServices.js");
+const { App_host } = require("../../config/index.js");
 
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,25}$/;
 
 const userAuthController = {
   async register(req, res, next) {
-// let file =req.file
+    // let file =req.file
     const { error } = registerUser.validate(req.body);
 
     if (error) {
@@ -36,12 +37,14 @@ const userAuthController = {
       return next(error);
     }
     if (req.body.type == userTypeEnum.Individual) {
-      req.body['status']=userStatusEnum.active
+      req.body['status'] = userStatusEnum.inactive
     }
 
-    // if (req.body.images && req.body.images.length) {
-    //   const images =await uploadImages(req, res)
-    // }
+    if (req.files && req.files.length) {
+      req.files.forEach(element => {
+          req.body['images'].push(`${App_host}profile/images/${element.filename}`)
+      });
+  }
     let accessToken;
     let refreshToken;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -205,7 +208,7 @@ const userAuthController = {
   },
   async getAUserByType(req, res, next) {
     try {
-      let { type, role, rehab, search ,sort,pricefilter} = req.body
+      let { type, role, rehab, search, sort, pricefilter } = req.body
       const { error } = getuserUser.validate(req.body);
 
       if (error) {
@@ -223,10 +226,10 @@ const userAuthController = {
         query['query'] = rehab
       }
       const options = pick(req.body, ["limit", "page"]);
-      if (sort){
-         sort=="ascending"?(sort=1):(sort=-1)
-        options["sort"]={
-          full_name:sort
+      if (sort) {
+        sort == "ascending" ? (sort = 1) : (sort = -1)
+        options["sort"] = {
+          full_name: sort
         }
       }
       const userList = await getList(User, query, options, [])
